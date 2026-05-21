@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Personal Arcade & Suite Portal</title>
+    <style>
+        :root {
+            --bg: #0d0e15;
+            --surface: #161925;
+            --surface-hover: #22263a;
+            --accent: #00ffcc;
+            --accent-gradient: linear-gradient(135deg, #00ffcc, #0077ff);
+            --text: #f0f4f8;
+            --text-muted: #7a889b;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        header {
+            text-align: center;
+            margin: 40px 0 20px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin: 0 0 10px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        .controls {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--surface);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid #22263a;
+        }
+
+        .search-bar {
+            background: #0d0e15;
+            border: 1px solid #2d324d;
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            min-width: 250px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        .search-bar:focus {
+            border-color: var(--accent);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            background: #0d0e15;
+            border: 1px solid #2d324d;
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--accent-gradient);
+            color: #000;
+            border-color: transparent;
+        }
+
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #22263a;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(0, 255, 204, 0.1);
+        }
+
+        .card-thumbnail {
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            background: linear-gradient(145deg, #1a1d2e, #11131c);
+            border-bottom: 1px solid #22263a;
+            cursor: pointer;
+        }
+
+        .card-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            margin: 0 0 8px 0;
+            font-weight: bold;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin: 0 0 20px 0;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-weight: bold;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .launch-btn {
+            background: var(--accent-gradient);
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .tab-btn {
+            background: #22263a;
+            color: #fff;
+            border: 1px solid #2d324d;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: #2d324d;
+            border-color: var(--accent);
+        }
+
+        /* Fullscreen Game Iframe Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-content {
+            width: 95%;
+            height: 90%;
+            max-width: 1400px;
+            background: #111;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .modal-header {
+            background: var(--surface);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #22263a;
+        }
+
+        .modal-title {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .game-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>My App Studio & Arcade</h1>
+        <p>A unified hub for your custom builds, games, and tools</p>
+    </header>
+
+    <div class="controls">
+        <input type="text" id="searchBox" class="search-bar" placeholder="Search item...">
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterCategory('all')">All</button>
+            <button class="filter-btn" onclick="filterCategory('game')">Games</button>
+            <button class="filter-btn" onclick="filterCategory('audio')">Audio</button>
+            <button class="filter-btn" onclick="filterCategory('tool')">Tools & Fun</button>
+        </div>
+    </div>
+
+    <div class="library-grid" id="libraryGrid">
+        </div>
+
+    <div class="modal-overlay" id="gameModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Game Panel</div>
+                <div class="modal-actions">
+                    <button class="tab-btn" id="modalTabBtn" onclick="">Open in New Tab ↗</button>
+                    <button class="close-btn" onclick="closeGame()">Return to Hub ✖</button>
+                </div>
+            </div>
+            <iframe src="" class="game-frame" id="gameFrame" allow="autoplay"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const items = [
+            { title: "Standard Chess", file: "CHESS.html", cat: "game", icon: "👑", desc: "A standard chess suite complete with responsive styling and a custom CSS promotion modal selection setup." },
+            { title: "Pokemon: Fusion Arena", file: "POKEMON.html", cat: "game", icon: "⚔️", desc: "Noah's Master Build Arena. Manage your party, fight fusion setups, track shiny entities, and trigger mega evolutions." },
+            { title: "UNO Card Game", file: "UNO.html", cat: "game", icon: "🃏", desc: "Classic multiplayer card game environment configured with color status tracking matching deck rules." },
+            { title: "Neon Dodge", file: "NEONJUMP.html", cat: "game", icon: "🕹️", desc: "An fast-paced aesthetic vertical canvas engine tracking incremental difficulty settings and speed multipliers." },
+            { title: "Hangman Game", file: "HANGMAN.html", cat: "game", icon: "🪓", desc: "A sleek canvas-drawn word-guessing mechanics game setup featuring phrases, wrap architecture, and responsive canvas layouts." },
+            { title: "Tic Tac Toe: Complete", file: "TICTACTOE.html", cat: "game", icon: "❌", desc: "Advanced Tic Tac Toe featuring full localization configs, dark/neon custom skins, and adjustable AI difficulties." },
+            { title: "Pro-Beat Architecture", file: "BEATMAKER.html", cat: "audio", icon: "🥁", desc: "A 16th-note Web Audio sequencer matrix engine designed to construct tracking grid rhythm architecture." },
+            { title: "Soundboard Utility", file: "SOUNDBOARD.html", cat: "audio", icon: "🔊", desc: "A custom modular sound dashboard loaded with favorites selectors and audio layout collision configuration overrides." },
+            { title: "Socrates Wisdom Panel", file: "SOCRATES.html", cat: "tool", icon: "🏛️", desc: "Immersive philosophical quotation UI configured with custom backdrop blur mechanics and typography grids." },
+            { title: "Click To Grow Engine", file: "CLICKTOGROW.html", cat: "tool", icon: "🌱", desc: "Color mutation grid engine and dynamic DOM font scaling toggle framework utilities." }
+        ];
+
+        const grid = document.getElementById('libraryGrid');
+        const searchBox = document.getElementById('searchBox');
+
+        function renderLibrary(filteredItems) {
+            grid.innerHTML = "";
+            if(filteredItems.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No entries found matching criteria.</p>`;
+                return;
+            }
+            
+            filteredItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `card`;
+                card.setAttribute('data-category', item.cat);
+
+                card.innerHTML = `
+                    <div class="card-thumbnail" onclick="launchGame('${item.file}', '${item.title}')">${item.icon}</div>
+                    <div class="card-body">
+                        <h3 class="card-title">${item.title}</h3>
+                        <p class="card-desc">${item.desc}</p>
+                        <div class="card-footer">
+                            <span class="tag">${item.cat}</span>
+                            <div class="btn-group">
+                                <button class="tab-btn" onclick="window.open('${item.file}', '_blank')">↗</button>
+                                <button class="launch-btn" onclick="launchGame('${item.file}', '${item.title}')">Launch</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function launchGame(filename, title) {
+            document.getElementById('modalTitle').innerText = title + " — Active Session";
+            document.getElementById('modalTabBtn').setAttribute('onclick', `window.open('${filename}', '_blank')`);
+            document.getElementById('gameFrame').src = filename;
+            document.getElementById('gameModal').style.display = 'flex';
+        }
+
+        function closeGame() {
+            document.getElementById('gameModal').style.display = 'none';
+            document.getElementById('gameFrame').src = ""; 
+        }
+
+        function filterCategory(cat) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            applyFilters(cat, searchBox.value.toLowerCase());
+        }
+
+        searchBox.addEventListener('input', () => {
+            const activeCatBtn = document.querySelector('.filter-btn.active').innerText.toLowerCase();
+            let currentCat = "all";
+            if(activeCatBtn.includes("game")) currentCat = "game";
+            if(activeCatBtn.includes("audio")) currentCat = "audio";
+            if(activeCatBtn.includes("tools")) currentCat = "tool";
+            
+            applyFilters(currentCat, searchBox.value.toLowerCase());
+        });
+
+        function applyFilters(category, query) {
+            const matches = items.filter(item => {
+                const matchesCat = (category === 'all' || item.cat === category);
+                const matchesQuery = item.title.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query);
+                return matchesCat && matchesQuery;
+            });
+            renderLibrary(matches);
+        }
+
+        renderLibrary(items);
+    </script>
+</body>
+</html>
